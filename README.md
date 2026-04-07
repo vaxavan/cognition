@@ -274,37 +274,5 @@ docker-compose down
 
 ---
 
-## 🤝 Вклад в проект
-
-1.  Создай форк репозитория
-2.  Создай ветку для фичи (`git checkout -b feature/amazing-feature`)
-3.  Закоммить изменения (`git commit -m 'Add amazing feature'`)
-4.  Запушь в ветку (`git push origin feature/amazing-feature`)
-5.  Открой Pull Request
-
-### Guidelines
-
-- ✅ Следуй [PEP 8](https://peps.python.org/pep-0008/) для кода на Python
-- ✅ Добавляй типизацию (type hints) везде, где возможно
-- ✅ Пиши докстринги в Google-style
-- ✅ Покрывай новую логику тестами
-
----
-
-## 📄 Лицензия
-
-Распространяется под лицензией **MIT**. См. файл [LICENSE](LICENSE) для деталей.
-
----
-
-## 👤 Автор
-
-**Alice** — fullstack разработчик 🛠️
-
-- 🔗 [GitHub](https://github.com/vaxavan)
-- 💡 Идеи и предложения приветствуются!
-
----
-
 > ⚠️ **Примечание для разработки**: Файлы `tools/minio.exe` и `tools/data/` намеренно исключены из репозитория через `.gitignore`. Скачайте MinIO отдельно при необходимости локального запуска хранилища.
 ```
