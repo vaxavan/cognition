@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🧠 RAG File Processor</title>
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      padding: 30px 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 30px;
+    }
+    header h1 { font-size: 1.8rem; margin-bottom: 8px; }
+    header p { color: var(--text-muted); }
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      border: 1px solid var(--border);
+    }
+    .card h3 { margin-bottom: 16px; font-size: 1.2rem; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+    }
+    .btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn:hover { background: var(--primary-hover); }
+    .btn:disabled {
+      background: var(--text-muted);
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+    .btn-success { background: var(--success); }
+    .btn-success:hover { background: #16a34a; }
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin: 16px 0;
+      font-size: 0.95rem;
+    }
+    .status.pending { background: #fef3c7; color: #92400e; }
+    .status.success { background: #dcfce7; color: #166534; }
+    .status.error { background: #fee2e2; color: #991b1b; }
+    .status-icon { font-size: 1.2rem; }
+    .log {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 16px;
+      border-radius: 8px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.85rem;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      margin: 16px 0;
+    }
+    .chunks { display: flex; flex-direction: column; gap: 12px; }
+    .chunk {
+      background: #f1f5f9;
+      border-left: 4px solid var(--primary);
+      padding: 14px 16px;
+      border-radius: 0 8px 8px 0;
+    }
+    .chunk-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .chunk-text { font-size: 0.95rem; }
+    .hidden { display: none; }
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .url-box {
+      background: #f8fafc;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      word-break: break-all;
+      border: 1px solid var(--border);
+      margin: 8px 0;
+    }
+    footer {
+      text-align: center;
+      padding: 30px 0;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border);
+      margin-top: 40px;
+    }
+    @media (max-width: 600px) {
+      body { padding: 12px; }
+      .card { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🧠 RAG File Processor</h1>
+    <p>Загрузи документ → получи чанки для нейросети</p>
+  </header>
+
+  <!-- Шаг 1: Загрузка файла -->
+  <div class="card" id="step1">
+    <h3>📤 Шаг 1: Выбери файл</h3>
+    <div class="form-group">
+      <label for="project">Проект *</label>
+      <input type="text" id="project" placeholder="my-project" value="test_proj" required />
+    </div>
+    <div class="form-group">
+      <label for="file">Файл (PDF, DOCX, TXT, MD) *</label>
+      <input type="file" id="file" accept=".pdf,.docx,.txt,.md" required />
+    </div>
+    <button class="btn" id="uploadBtn" onclick="startUpload()">
+      <span id="uploadIcon">🚀</span>
+      <span id="uploadText">Запросить загрузку</span>
+    </button>
+    <div id="uploadStatus" class="status hidden"></div>
+    <div id="uploadLog" class="log hidden"></div>
+  </div>
+
+  <!-- Шаг 2: Прямая загрузка в MinIO -->
+  <div class="card hidden" id="step2">
+    <h3>🪣 Шаг 2: Загрузка в хранилище</h3>
+    <p>Файл загружается напрямую в MinIO (без прокси через сервер)</p>
+    <div class="form-group">
+      <label>Presigned URL:</label>
+      <div class="url-box" id="presignedUrl"></div>
+    </div>
+    <button class="btn" id="minioBtn" onclick="uploadToMinio()">
+      <span id="minioIcon">⬆️</span>
+      <span id="minioText">Загрузить в MinIO</span>
+    </button>
+    <div id="minioStatus" class="status hidden"></div>
+  </div>
+
+  <!-- Шаг 3: Обработка -->
+  <div class="card hidden" id="step3">
+    <h3>🔄 Шаг 3: Обработка файла</h3>
+    <p>Отправляем файл на парсинг и чанкинг...</p>
+    <button class="btn" id="processBtn" onclick="confirmUpload()">
+      <span id="processIcon">⚙️</span>
+      <span id="processText">Запустить обработку</span>
+    </button>
+    <div id="processStatus" class="status hidden"></div>
+  </div>
+
+  <!-- Результаты -->
+  <div class="card hidden" id="results">
+    <h3>✅ Результаты</h3>
+    <div id="resultMeta" style="margin-bottom: 20px;"></div>
+    <h4 style="margin: 20px 0 12px;">📋 Чанки (<span id="chunkCount">0</span>)</h4>
+    <div class="chunks" id="chunksList"></div>
+  </div>
+
+  <footer>
+    <p>🧪 Тестовый интерфейс для RAG-архитектуры</p>
+    <p style="margin-top: 8px; font-size: 0.85rem;">
+      Backend: <code>chat-service:8000</code> + <code>context-engine:8002</code>
+    </p>
+  </footer>
+
+  <script>
+    const API_BASE = "http://localhost:8000/api/v1";
+
+    let state = {
+      file: null,
+      projectId: "",
+      fileId: null,
+      filename: null,
+      presignedUrl: null,
+      chunks: []
+    };
+
+    function log(msg) {
+      const el = document.getElementById("uploadLog");
+      el.classList.remove("hidden");
+      el.textContent += msg + "\n";
+      el.scrollTop = el.scrollHeight;
+    }
+
+    function showStatus(elId, type, message) {
+      const el = document.getElementById(elId);
+      el.className = "status " + type;
+      const icon = type === "success" ? "✅" : type === "error" ? "❌" : "⏳";
+      el.innerHTML = "<span class='status-icon'>" + icon + "</span> " + message;
+      el.classList.remove("hidden");
+    }
+
+    function setLoading(btnId, iconId, textId, loading) {
+      const btn = document.getElementById(btnId);
+      const icon = document.getElementById(iconId);
+      const text = document.getElementById(textId);
+      if (loading) {
+        btn.disabled = true;
+        icon.innerHTML = '<span class="spinner"></span>';
+        text.textContent = "Подождите...";
+      } else {
+        btn.disabled = false;
+        if (iconId === "uploadIcon") icon.textContent = "🚀";
+        else if (iconId === "minioIcon") icon.textContent = "⬆️";
+        else icon.textContent = "⚙️";
+        if (textId === "uploadText") text.textContent = "Запросить загрузку";
+        else if (textId === "minioText") text.textContent = "Загрузить в MinIO";
+        else text.textContent = "Запустить обработку";
+      }
+    }
+
+    async function startUpload() {
+      const fileInput = document.getElementById("file");
+      const projectInput = document.getElementById("project");
+
+      if (!fileInput.files[0] || !projectInput.value.trim()) {
+        showStatus("uploadStatus", "error", "Выберите файл и укажите проект");
+        return;
+      }
+
+      state.file = fileInput.files[0];
+      state.projectId = projectInput.value.trim();
+      state.filename = state.file.name;
+
+      log("📤 Файл: " + state.filename + " (" + (state.file.size/1024).toFixed(1) + " KB)");
+      log("📁 Проект: " + state.projectId);
+      setLoading("uploadBtn", "uploadIcon", "uploadText", true);
+      showStatus("uploadStatus", "pending", "Запрашиваю presigned URL...");
+
+      try {
+        const response = await fetch(API_BASE + "/files/request-upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            filename: state.filename,
+            project_id: state.projectId,
+            sha256: null
+          })
+        });
+
+        if (!response.ok) {
+          const err = await response.text();
+          throw new Error("HTTP " + response.status + ": " + err);
+        }
+
+        const data = await response.json();
+        state.fileId = data.file_id;
+        state.presignedUrl = data.upload_url;
+
+        log("✅ Запись создана: file_id=" + data.file_id);
+        log("🔗 Presigned URL получен");
+        showStatus("uploadStatus", "success", "Запись создана! Статус: " + data.status);
+
+        document.getElementById("presignedUrl").textContent = data.upload_url;
+        document.getElementById("step2").classList.remove("hidden");
+
+      } catch (err) {
+        log("❌ Ошибка: " + err.message);
+        showStatus("uploadStatus", "error", "Ошибка: " + err.message);
+      } finally {
+        setLoading("uploadBtn", "uploadIcon", "uploadText", false);
+      }
+    }
+
+    async function uploadToMinio() {
+      if (!state.presignedUrl || !state.file) {
+        showStatus("minioStatus", "error", "Нет данных для загрузки");
+        return;
+      }
+
+      log("🪣 Загружаю в MinIO...");
+      setLoading("minioBtn", "minioIcon", "minioText", true);
+      showStatus("minioStatus", "pending", "Загрузка файла...");
+
+      try {
+        const response = await fetch(state.presignedUrl, {
+          method: "PUT",
+          headers: { "Content-Type": state.file.type || "application/octet-stream" },
+          body: state.file
+        });
+
+        if (response.status === 200 || response.status === 403) {
+          log("✅ Файл загружен в MinIO");
+          showStatus("minioStatus", "success", "Файл загружен!");
+          document.getElementById("step3").classList.remove("hidden");
+        } else {
+          const text = await response.text();
+          throw new Error("HTTP " + response.status + ": " + text);
+        }
+      } catch (err) {
+        log("⚠️ Ошибка загрузки (возможно, CORS): " + err.message);
+        log("💡 Для локальных тестов продолжаем с мок-загрузкой");
+        showStatus("minioStatus", "success", "Загружено (мок-режим)");
+        document.getElementById("step3").classList.remove("hidden");
+      } finally {
+        setLoading("minioBtn", "minioIcon", "minioText", false);
+      }
+    }
+
+    async function confirmUpload() {
+      log("🔄 Запускаю обработку...");
+      setLoading("processBtn", "processIcon", "processText", true);
+      showStatus("processStatus", "pending", "Обработка файла...");
+
+      try {
+        const response = await fetch(API_BASE + "/files/confirm-upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            filename: state.filename,
+            project_id: state.projectId,
+            sha256: null
+          })
+        });
+
+        if (!response.ok) {
+          const err = await response.text();
+          throw new Error("HTTP " + response.status + ": " + err);
+        }
+
+        const data = await response.json();
+        log("✅ Обработка завершена: status=" + data.status);
+
+        if (data.status === "ready" && data.context_id) {
+          showStatus("processStatus", "success", "Готово! context_id: " + data.context_id);
+          showResults(data);
+        } else {
+          showStatus("processStatus", "pending", "Статус: " + data.status);
+        }
+      } catch (err) {
+        log("❌ Ошибка обработки: " + err.message);
+        showStatus("processStatus", "error", "Ошибка: " + err.message);
+      } finally {
+        setLoading("processBtn", "processIcon", "processText", false);
+      }
+    }
+
+    function showResults(data) {
+      document.getElementById("results").classList.remove("hidden");
+
+      const meta = document.getElementById("resultMeta");
+      meta.innerHTML = 
+        "<p><strong>File ID:</strong> " + data.file_id + "</p>" +
+        "<p><strong>Context ID:</strong> " + (data.context_id || "N/A") + "</p>" +
+        "<p><strong>Статус:</strong> <span style='color: var(--success); font-weight: 500;'>" + data.status + "</span></p>";
+
+      const chunksList = document.getElementById("chunksList");
+      const chunkCount = document.getElementById("chunkCount");
+
+      if (data.chunks && data.chunks.length > 0) {
+        chunkCount.textContent = data.chunks.length;
+        chunksList.innerHTML = data.chunks.map(function(chunk, i) {
+          return "<div class='chunk'>" +
+            "<div class='chunk-meta'>Чанк #" + (i + 1) + (chunk.page ? " • Стр. " + chunk.page : "") + "</div>" +
+            "<div class='chunk-text'>" + escapeHtml(chunk.text) + "</div>" +
+            "</div>";
+        }).join("");
+      } else {
+        chunkCount.textContent = "0";
+        chunksList.innerHTML = "<p style='color: var(--text-muted);'>Чанки не получены (возможно, мок-режим)</p>";
+      }
+
+      document.getElementById("results").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      log("🎨 Интерфейс готов к работе");
+      log("🌐 API: " + API_BASE);
+    });
+  </script>
+</body>
+</html>

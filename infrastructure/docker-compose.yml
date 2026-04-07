@@ -1,0 +1,28 @@
+services:
+  chat-service:
+    build: ../chat-service
+    ports: ["8000:8000"]
+    env_file: ../chat-service/.env
+    depends_on: [postgres, minio]
+  context-engine:
+    build: ../context-engine
+    ports: ["8002:8002"]
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: chat
+    ports: ["5432:5432"]
+    volumes: [pg_data:/var/lib/postgresql/data]
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    ports: ["9000:9000", "9001:9001"]
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes: [minio_data:/data]
+volumes:
+  pg_
+  minio_data:

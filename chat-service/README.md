@@ -1,0 +1,1 @@
+# Chat Service\n\nAPI Orchestrator для RAG/Chat системы.\n\n## Запуск\n```bash\npip install -e .\nuvicorn app.main:app --reload\n```\n

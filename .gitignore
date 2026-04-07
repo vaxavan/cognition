@@ -1,0 +1,21 @@
+﻿# Large binaries
+tools/minio.exe
+tools/data/
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+*.egg
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log

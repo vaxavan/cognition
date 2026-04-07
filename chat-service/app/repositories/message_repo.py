@@ -1,0 +1,1 @@
+from app.repositories.base import BaseRepository\nfrom app.models.message import Message\nclass MessageRepository(BaseRepository[Message]):\n    pass\n

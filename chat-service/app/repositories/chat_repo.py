@@ -1,0 +1,1 @@
+from app.repositories.base import BaseRepository\nfrom app.models.chat import Chat\nclass ChatRepository(BaseRepository[Chat]):\n    pass\n

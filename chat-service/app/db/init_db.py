@@ -1,0 +1,1 @@
+# DB seeding for dev — заглушка\n

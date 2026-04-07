@@ -1,0 +1,1 @@
+.PHONY: dev chat context infra\ndev:\n\tcd chat-service && uvicorn app.main:app --reload --port 8000\nchat:\n\tcd chat-service && uvicorn app.main:app --reload\ncontext:\n\tcd context-engine && uvicorn app.main:app --reload --port 8002\ninfra:\n\tdocker compose -f infrastructure/docker-compose.yml up -d\n

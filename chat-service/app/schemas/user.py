@@ -1,0 +1,8 @@
+from pydantic import BaseModel, EmailStr, field_validator
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str = Field(..., min_length=8)
+class UserResponse(BaseModel):
+    id: int
+    email: str
+    class Config: from_attributes = True

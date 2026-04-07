@@ -1,0 +1,1 @@
+# Message ORM model — заглушка\nfrom app.models.base import Base\n

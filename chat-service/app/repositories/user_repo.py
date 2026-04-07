@@ -1,0 +1,1 @@
+from app.repositories.base import BaseRepository\nfrom app.models.user import User\nclass UserRepository(BaseRepository[User]):\n    pass\n
