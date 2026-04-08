@@ -27,42 +27,101 @@
             overflow-x: auto;
         }
         code { font-family: 'JetBrains Mono', monospace; }
+        .sidebar-enter { transform: translateX(-100%); }
+        .sidebar-enter-active { transform: translateX(0); transition: transform 200ms; }
+        .sidebar-exit { transform: translateX(0); }
+        .sidebar-exit-active { transform: translateX(-100%); transition: transform 200ms; }
     </style>
 </head>
-<body class="bg-[#0f0f0f] text-gray-200 h-screen flex flex-col">
-    <!-- Шапка с названием и кнопкой выхода -->
-    <header class="border-b border-gray-800 px-4 py-3 flex items-center justify-between">
-        <h1 class="text-xl font-semibold">🧠 Cognition Chat</h1>
-        <div class="flex items-center gap-3">
-            <span id="user-email" class="text-sm text-gray-400"></span>
-            <button id="logout-btn" class="flex items-center gap-2 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded-lg transition text-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                    <polyline points="16 17 21 12 16 7"></polyline>
-                    <line x1="21" y1="12" x2="9" y2="12"></line>
+<body class="bg-[#0f0f0f] text-gray-200 h-screen flex overflow-hidden">
+    
+    <!-- ЛЕВАЯ ПАНЕЛЬ: Файлы -->
+    <aside id="files-sidebar" class="w-80 border-r border-gray-800 bg-[#151515] flex flex-col h-full">
+        <div class="p-4 border-b border-gray-800 flex items-center justify-between">
+            <h2 class="font-medium text-gray-300">📁 Загруженные файлы</h2>
+            <button id="toggle-sidebar-btn" class="text-gray-400 hover:text-white p-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
-                Выйти
             </button>
         </div>
-    </header>
+        
+        <div id="files-list" class="flex-1 overflow-y-auto p-3 space-y-2">
+            <!-- Файлы будут добавляться сюда -->
+            <div class="text-gray-500 text-sm text-center py-4">Нет загруженных файлов</div>
+        </div>
+        
+        <div class="p-4 border-t border-gray-800">
+            <button id="upload-file-btn" class="w-full bg-gray-800 hover:bg-gray-700 py-2 rounded-lg text-sm flex items-center justify-center gap-2 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                Загрузить файл
+            </button>
+        </div>
+    </aside>
 
-    <main id="chat-messages" class="flex-1 overflow-y-auto px-4 md:px-6 lg:px-8 py-6">
-        <div class="max-w-3xl mx-auto space-y-4"></div>
+    <!-- СКРЫТАЯ КНОПКА ДЛЯ ОТКРЫТИЯ САЙДБАРА -->
+    <button id="show-sidebar-btn" class="hidden absolute left-4 top-4 z-10 p-2 bg-gray-800 rounded-lg hover:bg-gray-700">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+    </button>
+
+    <!-- ГЛАВНАЯ ОБЛАСТЬ: Чат -->
+    <main class="flex-1 flex flex-col h-full">
+        
+        <!-- Верхняя панель: Выбор нейросети + Выход -->
+        <header class="border-b border-gray-800 px-6 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <h1 class="text-lg font-semibold">🧠 Cognition Chat</h1>
+                
+                <!-- Выпадающий список нейросетей -->
+                <select id="model-selector" class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600">
+                    <option value="model-1">🧪 Модель 1</option>
+                    <option value="model-2">⚡ Модель 2</option>
+                    <option value="model-3">🔥 Модель 3</option>
+                </select>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <span id="user-email" class="text-sm text-gray-400"></span>
+                <button id="logout-btn" class="flex items-center gap-2 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded-lg transition text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Выйти
+                </button>
+            </div>
+        </header>
+
+        <!-- Область сообщений -->
+        <div id="chat-messages" class="flex-1 overflow-y-auto px-4 md:px-6 lg:px-8 py-6">
+            <div class="max-w-3xl mx-auto space-y-4"></div>
+        </div>
+
+        <!-- Поле ввода -->
+        <footer class="border-t border-gray-800 p-4">
+            <div class="max-w-3xl mx-auto flex gap-2">
+                <textarea id="message-input" rows="1" placeholder="Введите сообщение..."
+                    class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    style="max-height: 150px; min-height: 48px;"></textarea>
+                <button id="send-btn" class="bg-blue-600 hover:bg-blue-700 px-5 rounded-lg transition flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </footer>
     </main>
 
-    <footer class="border-t border-gray-800 p-4">
-        <div class="max-w-3xl mx-auto flex gap-2">
-            <textarea id="message-input" rows="1" placeholder="Введите сообщение..."
-                class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-blue-600"
-                style="max-height: 150px; min-height: 48px;"></textarea>
-            <button id="send-btn" class="bg-blue-600 hover:bg-blue-700 px-5 rounded-lg transition flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                </svg>
-            </button>
-        </div>
-    </footer>
+    <!-- Скрытый input для загрузки файлов -->
+    <input type="file" id="file-input" multiple class="hidden" accept=".pdf,.docx,.txt,.md">
 
     <script src="app.js"></script>
 </body>
