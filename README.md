@@ -275,4 +275,6 @@ docker-compose down
 ---
 
 > ⚠️ **Примечание для разработки**: Файлы `tools/minio.exe` и `tools/data/` намеренно исключены из репозитория через `.gitignore`. Скачайте MinIO отдельно при необходимости локального запуска хранилища.
+https://dl.min.io/server/minio/release/windows-amd64/minio.exe
+> 
 ```
