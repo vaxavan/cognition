@@ -4,6 +4,7 @@ from typing import Optional
 class FileUploadRequest(BaseModel):
     filename: str = Field(..., min_length=1, max_length=255, description="Имя файла")
     project_id: str = Field(..., min_length=1, description="ID проекта")
+    file_id: Optional[str] = None
     sha256: Optional[str] = Field(None, pattern=r"^[a-f0-9]{64}$", description="SHA256 хеш файла")
 
     @field_validator('filename')

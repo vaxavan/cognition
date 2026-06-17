@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cognition • Вход</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1e1e1e; }
+        ::-webkit-scrollbar-thumb { background: #3a3a3a; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-[#0f0f0f] text-gray-200 h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <!-- Логотип -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold mb-2">🧠 Cognition</h1>
+            <p class="text-gray-400">Войдите или создайте аккаунт</p>
+        </div>
+
+        <!-- Карточка с формой -->
+        <div class="bg-[#1a1a1a] rounded-2xl p-6 border border-gray-800">
+            
+            <!-- Шаг 1: Почта и пароль -->
+            <div id="step-credentials">
+                <label class="block text-sm font-medium mb-2 text-gray-300">Email</label>
+                <input type="email" id="email-input" placeholder="you@example.com" 
+                    class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                
+                <label class="block text-sm font-medium mb-2 text-gray-300">Пароль</label>
+                <input type="password" id="password-input" placeholder="Не менее 6 символов"
+                    class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                
+                <button id="continue-btn" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-medium transition">
+                    Продолжить
+                </button>
+                
+                <p class="text-xs text-gray-500 text-center mt-4">
+                    Нажимая «Продолжить», вы соглашаетесь с условиями
+                </p>
+            </div>
+
+            <!-- Шаг 2: Код подтверждения -->
+            <div id="step-code" class="hidden">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2 text-gray-300">
+                        Код подтверждения
+                    </label>
+                    <input type="text" id="code-input" placeholder="000000" maxlength="6"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-center text-2xl tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-600">
+                    <p class="text-xs text-gray-500 mt-2">
+                        Код отправлен на <span id="email-display"></span>
+                    </p>
+                </div>
+
+                <button id="verify-btn" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-medium transition mb-3">
+                    Подтвердить
+                </button>
+                
+                <button id="back-btn" class="w-full text-gray-400 hover:text-white py-2 text-sm transition">
+                    ← Назад
+                </button>
+            </div>
+        </div>
+
+        <!-- Сообщения об ошибках -->
+        <div id="error-message" class="mt-4 text-sm text-red-400 text-center hidden"></div>
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+</html>

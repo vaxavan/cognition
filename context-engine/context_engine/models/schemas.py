@@ -1,9 +1,9 @@
-from enum import StrEnum
+from enum import Enum
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field, ConfigDict
 
 
-class ProcessingStatus(StrEnum):
+class ProcessingStatus(Enum):
     """Статусы обработки"""
     PENDING = "pending"
     PROCESSING = "processing"
